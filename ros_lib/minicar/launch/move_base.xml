@@ -1,13 +1,12 @@
-<node pkg="move_base" type="move_base" name="move_base" machine="c2">
-  <remap from="odom" to="pr2_base_odometry/odom" />
-  <param name="controller_frequency" value="10.0" />
-  <param name="footprint_padding" value="0.015" />
-  <param name="controller_patience" value="15.0" />
-  <param name="clearing_radius" value="0.59" />
-  <rosparam file="$(find 2dnav_pr2)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-  <rosparam file="$(find 2dnav_pr2)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-  <rosparam file="$(find 2dnav_pr2)/move_base/local_costmap_params.yaml" command="load" />
-  <rosparam file="$(find 2dnav_pr2)/move_base/global_costmap_params.yaml" command="load" />
-  <rosparam file="$(find 2dnav_pr2)/move_base/navfn_params.yaml" command="load" />
-  <rosparam file="$(find 2dnav_pr2)/move_base/base_local_planner_params.yaml" command="load" />
-</node>
+<?xml version="1.0"?>
+<launch>
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" clear_params="true">
+    <param name="map_topic" value="/rtabmap/grid"/> 
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/> 	
+	<rosparam file="$(find minicar)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+	<rosparam file="$(find minicar)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+	<rosparam file="$(find minicar)/config/local_costmap_params.yaml" command="load" />
+	<rosparam file="$(find minicar)/config/global_costmap_params.yaml" command="load" />
+	<rosparam file="$(find minicar)/config/base_local_planner_params.yaml" command="load" />
+	</node>
+</launch>

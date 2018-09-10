@@ -1,0 +1,15 @@
+obstacle_range: 5
+raytrace_range: 0.5
+footprint: [[-0.14, 0.14], [0.14, 0.14], [0.14, -0.14], [-0.14, -0.14]]
+inflation_radius: 0.1
+cost_scaling_factor: 0.05
+observation_sources: point_cloud_sensor
+transform_tolerance: 3
+point_cloud_sensor: {
+    sensor_frame: camera_depth_optical_frame,
+    data_type: PointCloud2,
+    topic: /camera/depth/color/points,
+    marking: true,
+    clearing: true
+  }
+

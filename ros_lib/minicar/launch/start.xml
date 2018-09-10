@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+         <arg name="model" />  
+         <param name="robot_description" textfile="$(find minicar)/urdf/demo.urdf" /> 
+	 <param name="use_gui" value="False"/>
+         <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
+         <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+
+	<node pkg="tf" type="static_transform_publisher" name="cam_base_broadcaster" args="0 0 0.2 0 0 0 /base_link /camera_link 100" />
+	<!--node name="map_server" pkg="map_server" type="map_server" args="$(find minicar)/maps/map.yaml"/-->
+
+	<!--node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+	
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/> 
+	<rosparam file="$(find minicar)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+	<rosparam file="$(find minicar)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+	<rosparam file="$(find minicar)/config/local_costmap_params.yaml" command="load" />
+	<rosparam file="$(find minicar)/config/global_costmap_params.yaml" command="load" />
+	<rosparam file="$(find minicar)/config/base_local_planner_params.yaml" command="load" />
+	</node-->
+
+	<node pkg="minicar" type="minicar" name="minicar">
+	<param name="port_path" value="/dev/ttyUSB0" />
+	</node>
+        <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" /--> 
+</launch>

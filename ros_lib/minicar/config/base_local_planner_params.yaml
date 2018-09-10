@@ -1,6 +1,6 @@
 DWAPlannerROS:
-  max_vel_x: 3
-  min_vel_x: -0.3
+  max_vel_x: 0.3
+  min_vel_x: -0.0
   max_vel_y: 0
   max_vel_theta: 2.0
   min_vel_theta: -2.0
@@ -11,11 +11,11 @@ DWAPlannerROS:
   acc_lim_theta: 1
   acc_lim_x: 3
   acc_lim_y: 0
-  escape_vel: 0.8
+  escape_vel: 0.0
 
   vx_samples: 20
   vtheta_samples: 20
-  sim_time: 30
+  sim_time: 5
 
   path_distance_bias: 20
 
@@ -26,3 +26,5 @@ DWAPlannerROS:
   sim_granularity: 0.1
 
   occdist_scale: 0.05
+  
+  controller_frequency: 10

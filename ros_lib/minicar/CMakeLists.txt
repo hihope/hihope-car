@@ -156,7 +156,7 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(minicar src/minicar.cpp src/car_if.cpp src/hikey970_uart.cpp )
+add_executable(minicar src/minicar.cpp src/car_if.cpp src/hikey970_uart.cpp src/kffilter_angle.cpp)
 
 target_link_libraries(minicar ${catkin_LIBRARIES})
 

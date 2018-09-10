@@ -42,18 +42,40 @@ int Car_interface::check_ack(char cmd)
 }
 
 
+ int  Car_interface::readc_and_check_data(char cmd)
+{	
+	struct Ack_Cmd ack_buf;	
+	int ret =0;
+	G_Uport->Recv((char*)(&ack_buf),sizeof(struct Ack_Cmd));
+	if(((ack_buf.ack_head&0xff) == CMD_ACK_HEAD) && ((ack_buf.ack_end&0xff) == CMD_ACK_END)){
+			if((ack_buf.ack_type &0xff)== cmd){
+				ROS_INFO("check ack ok !: %x ",cmd);
+				ret = ack_buf.ack_value;
+			}else{
+				ret = -1;
+				ROS_ERROR("check ack error type !: %x %x %x %x  \n ",cmd ,ack_buf.ack_head,ack_buf.ack_type,ack_buf.ack_value,ack_buf.ack_end);
+			}
+	} else{
+		ret =-1;
+        G_Uport->Flush();
+		ROS_ERROR("check ack error  !: %x %x %x %x  \n ",cmd ,ack_buf.ack_head,ack_buf.ack_type,ack_buf.ack_value,ack_buf.ack_end);
+	}
+	return ret;
+}
+
+
 unsigned int  Car_interface::read2c_and_check_data(struct Read_Int_Data *data_buf,char cmd)
 {	
 	int ret =0;
 	G_Uport->Recv((char*)data_buf,sizeof(struct Read_Int_Data));
 	if(((data_buf->head & 0xff) == CMD_DATA_HEAD) && ((data_buf->end & 0xff)== CMD_DATA_END)){
 			if((data_buf->type &0xff)== cmd) {
-					ROS_INFO("read azimuth ok !: %x %x %x ",data_buf->type,data_buf->value_l,data_buf->value_l);
+					ROS_INFO("read2c_and_check_data ok !: %x %x %x ",data_buf->type,data_buf->value_l,data_buf->value_l);
 			}
 	} else {
 		ret = -1;
-                G_Uport->Flush();
-		ROS_ERROR("read azimuth error !: %x %x %x %x \n ",data_buf->head,data_buf->type,data_buf->value_l,data_buf->end);
+        G_Uport->Flush();
+		ROS_ERROR("read2c_and_check_data error !: %x %x %x %x \n ",data_buf->head,data_buf->type,data_buf->value_l,data_buf->end);
 		}
 	
 	if(!ret)
@@ -68,12 +90,12 @@ unsigned int  Car_interface::readi_and_check_data(struct Read_Int_Data *data_buf
 	G_Uport->Recv((char*)data_buf,sizeof(struct Read_Int_Data));
 	if(((data_buf->head & 0xff) == CMD_DATA_HEAD) && ((data_buf->end & 0xff)== CMD_DATA_END)){
 			if((data_buf->type &0xff)== cmd) {
-					ROS_INFO("read azimuth ok !: %x %x %x ",data_buf->type,data_buf->value_l,data_buf->value_l);
+					ROS_INFO("readi_and_check_data ok !: %x %x %x ",data_buf->type,data_buf->value_l,data_buf->value_l);
 			}
 	} else {
 		ret = -1;
                 G_Uport->Flush();
-		ROS_ERROR("read azimuth error !: %x %x %x %x \n ",data_buf->head,data_buf->type,data_buf->value_l,data_buf->end);
+		ROS_ERROR("readi_and_check_data error !: %x %x %x %x \n ",data_buf->head,data_buf->type,data_buf->value_l,data_buf->end);
 		}
 	
 	if(!ret)
@@ -88,11 +110,11 @@ unsigned int  Car_interface::readm_and_check_data(struct Read_Multi_Data *data_b
 	G_Uport->Recv((char*)data_buf,sizeof(struct Read_Multi_Data));
 	if(((data_buf->head & 0xff) == CMD_DATA_HEAD) && ((data_buf->end & 0xff)== CMD_DATA_END)){
 			if((data_buf->type &0xff)== cmd) {
-					ROS_INFO("read multi data ok !: %x %x %x ",data_buf->type,data_buf->value0_l,data_buf->value1_l);
+					ROS_INFO("readm_and_check_data ok !: %x %x %x ",data_buf->type,data_buf->value0_l,data_buf->value1_l);
 			}
 	} else {
 		ret = -1;
-		ROS_ERROR("read multi data error !: %x %x %x %x \n ",data_buf->head,data_buf->type,data_buf->value0_l,data_buf->end);
+		ROS_ERROR("readm_and_check_data error !: %x %x %x %x \n ",data_buf->head,data_buf->type,data_buf->value0_l,data_buf->end);
 		}
 	return ret;
 }
@@ -137,6 +159,19 @@ int Car_interface::set_direction(char dir){
 	out_buf.cmd_end = CMD_END;
 	G_Uport->Send((char*)(&out_buf),sizeof(struct Car_Cmd));
 	ret = check_ack(CMD_DIR);
+	return ret;
+}
+
+int Car_interface::get_walks(void){
+	int ret =0;
+	struct Car_Cmd out_buf;
+	MutexUniqueLock lk(Transfer_Mutex);
+	out_buf.cmd_head = CMD_HEAD;
+	out_buf.cmd_type = CMD_SIMPLE_READ_WALK;
+	out_buf.cmd_value = 0;
+	out_buf.cmd_end = CMD_END;
+	G_Uport->Send((char*)(&out_buf),sizeof(struct Car_Cmd));
+	ret = readc_and_check_data(CMD_SIMPLE_READ_WALK);
 	return ret;
 }
 

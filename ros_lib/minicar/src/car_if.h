@@ -38,7 +38,7 @@ using namespace std;
 #define CMD_IMU_CAPRATION             0x47
 #define CMD_SIMPLE_READ             0X48
 #define CMD_CAPRATION_STATUS        0X49
-
+#define CMD_SIMPLE_READ_WALK        0X50
 
 #define CMD_END					0xbb
 
@@ -138,7 +138,8 @@ public:
 	int simple_read(unsigned char * out_buf);
 	int capration(void);
 	char capration_status_read(void);
-
+    int get_walks(void);
+	int readc_and_check_data(char cmd);
 //	int get_position_data(void);
 //	int set_position(int x,int y,int z);
 }; 

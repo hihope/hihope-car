@@ -1,21 +1,22 @@
 <?xml version="1.0"?>
 <launch>
-         <arg name="model" />  
-         <param name="robot_description" textfile="$(find minicar)/urdf/demo.urdf" /> 
-	 <param name="use_gui" value="False"/>
-         <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
-         <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+	<arg name="model" />  
+	<param name="robot_description" textfile="$(find minicar)/urdf/demo.urdf" /> 
+	<param name="use_gui" value="False"/>
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+	<node pkg="tf" type="static_transform_publisher" name="cam_base_broadcaster" args="0 0 0.2 0 0 0 /base_link /camera_link 100" />
+  <node pkg="tf" type="static_transform_publisher" name="odom_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
 
-
+	<include file="$(find realsense2_camera)/launch/rs_aligned_depth.launch" />
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find minicar)/maps/map.yaml"/>
-
-	<node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 /map /odom 100" />
-
-
-
-	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+	<!--node name="gmapping" pkg="slam_gmapping" type="slam_gmapping" args="scan:=/scan"/-->
 	
-        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/> 
+	<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" args="image:=/camera/aligned_depth_to_color/image_raw"/>
+	
+	<!--remap from="map" to="/rtabmap/grid_map" /-->
+	<node pkg="move_base"  type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/> 	
 	<rosparam file="$(find minicar)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
 	<rosparam file="$(find minicar)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
 	<rosparam file="$(find minicar)/config/local_costmap_params.yaml" command="load" />
@@ -23,6 +24,10 @@
 	<rosparam file="$(find minicar)/config/base_local_planner_params.yaml" command="load" />
 	</node>
 
-	<node pkg="minicar" type="minicar" name="minicar"/>
-        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" /> 
+	<node pkg="minicar" type="minicar" name="minicar">
+	<param name="port_path" value="/dev/ttyUSB0" />
+	</node>
+	
+	<!--include file="$(find rtabmap_ros)/launch/hikey_nvm.launch" /-->	 
+        <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" /--> 
 </launch>
